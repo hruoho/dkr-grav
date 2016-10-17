@@ -1,4 +1,4 @@
-FROM nginx
+FROM nginx:latest
 
 # PHP
 ENV PHP_FPM_USER=www-data
