@@ -3,7 +3,7 @@
 ## Basics
 This image builds on top of nginx:latest. It uses supervisord to run nginx & php-fpm.
 We configure nginx to use ssl with self-signed certs. Also, we mount
-[Grav cms](https://getgrav.org) with admin panel to `/usr/share/nginx/`.
+[Grav cms](https://getgrav.org) with admin panel to `/usr/share/nginx/html`.
 
 Use this image as a base for developing a Grav-based website. Each container
 contains a fresh Grav-install so you can develop your sites containerwise.
