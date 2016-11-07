@@ -1,4 +1,4 @@
-FROM ubuntu
+FROM phusion/baseimage
 
 RUN apt-get update
 
@@ -49,5 +49,6 @@ RUN rm -rf /var/lib/apt/lists/*
 
 ADD ./install.sh /
 
-CMD bash /install.sh $SUB && sed -i "s|SUB|$SUB|" /etc/nginx/conf.d/default.conf && \
+CMD bash /install.sh $SUB && \
+  sed -i "s|SUB|$SUB|" /etc/nginx/conf.d/default.conf && \
   /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
