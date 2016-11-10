@@ -15,6 +15,9 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
         nginx \
         supervisor
 
+# Clear apt
+RUN rm -rf /var/lib/apt/lists/*
+
 # Configure and secure PHP
 RUN sed -i "s/;date.timezone =.*/date.timezone = UTC/" /etc/php/7.0/fpm/php.ini && \
     sed -i -e "s/;daemonize\s*=\s*yes/daemonize = no/g" /etc/php/7.0/fpm/php-fpm.conf && \
@@ -24,31 +27,37 @@ RUN sed -i "s/;date.timezone =.*/date.timezone = UTC/" /etc/php/7.0/fpm/php.ini 
     # sed -i '/^listen = /clisten = 0.0.0.0:9000' /etc/php/7.0/fpm/pool.d/www.conf
 
 
+
+RUN useradd nginx && usermod -aG www-data nginx
 RUN mkdir -p /run/php/php7.0-fpm/ && touch /run/php/php7.0-fpm/pid
 
 # NGINX
-RUN ln -sf /dev/stdout /var/log/nginx/access.log \
- && ln -sf /dev/stderr /var/log/nginx/error.log
+# RUN ln -sf /dev/stdout /var/log/nginx/access.log \
+#  && ln -sf /dev/stderr /var/log/nginx/error.log
 
-ARG nginx=nginx.conf
-COPY $nginx /etc/nginx/nginx.conf
+ADD ./add/nginx.conf /etc/nginx/nginx.conf
+ADD ./add/default.conf /etc/nginx/conf.d/default.conf
 
-ARG server=server.conf
-COPY $server /etc/nginx/conf.d/default.conf
-
-RUN useradd nginx && usermod -aG www-data nginx
+WORKDIR /usr/share/nginx/html
 
 # SUPERVISOR
 RUN mkdir -p /var/log/supervisor \
     && touch /var/log/supervisor/supervisord.log
 
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+ADD ./add/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Clear apt
-RUN rm -rf /var/lib/apt/lists/*
+ENV SUB=''
 
-ADD ./install.sh /
+CMD if [ ! -z $SUB ]; \
+    then \
+    perl -pi -e "s|location /|location /$SUB|" /etc/nginx/conf.d/default.conf; \
+    perl -pi -e "s|/index\.php|/$SUB/index.php|" /etc/nginx/conf.d/default.conf; \
+    fi && /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
 
-CMD bash /install.sh $SUB && \
-  sed -i "s|SUB|$SUB|" /etc/nginx/conf.d/default.conf && \
-  /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
+# If SUB is not empty, relocate Grav and fix config
+# CMD if [ ! -z $SUB ]; \
+#     then mv html $SUB; \
+#     mkdir html && mv $SUB html/; \
+#     perl -pi -e "s|location /|location /$SUB|" /etc/nginx/conf.d/default.conf; \
+#     perl -pi -e "s|/index\.php|/$SUB/index.php|" /etc/nginx/conf.d/default.conf; \
+#     fi && /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
