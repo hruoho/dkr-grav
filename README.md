@@ -1,11 +1,7 @@
-# Usage
+# What?
+A docker image to set up basic nginx & php services for [Grav](https://getgrav.org). Builds on top of phusion/baseimage and uses supervisord to run nginx & php-fpm.
 
-## Basics
-This image builds on top of phusion/baseimage. It uses supervisord to run nginx & php-fpm.
-
-Use this image as a base for developing a Grav-based website. Each container
-has a fresh Grav-install so you can develop your sites containerwise.
-
+## Usage
 ### Build
 
     docker build -t gravcms .
@@ -23,7 +19,7 @@ or
   version: '2'
 
   services:
-  
+
     mygrav:
       image: gravcms
       volumes:
