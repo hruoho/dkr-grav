@@ -46,6 +46,6 @@ ENV SUB=''
 
 CMD if [ ! -z $SUB ]; \
     then \
-    perl -pi -e "s|location /|location /$SUB|" /etc/nginx/conf.d/default.conf; \
-    perl -pi -e "s|/index\.php|/$SUB/index.php|" /etc/nginx/conf.d/default.conf; \
+    perl -pi -e "s|location / |location /$SUB |" /etc/nginx/conf.d/default.conf; \
+    perl -pi -e "s| /index\.php| /$SUB/index.php|" /etc/nginx/conf.d/default.conf; \
     fi && /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
