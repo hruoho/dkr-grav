@@ -34,8 +34,6 @@ RUN mkdir -p /run/php/php7.0-fpm/ && touch /run/php/php7.0-fpm/pid
 ADD ./inc/nginx.conf /etc/nginx/nginx.conf
 ADD ./inc/default.conf /etc/nginx/conf.d/default.conf
 
-WORKDIR /usr/share/nginx/html
-
 # SUPERVISOR
 RUN mkdir -p /var/log/supervisor \
     && touch /var/log/supervisor/supervisord.log
